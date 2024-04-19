@@ -6,10 +6,8 @@ import qualified Runtime.Filesystem as FS
 import Language.Syntax
 import Language.Types
 import Language.Eval
-
 import System.Directory
 import System.FilePath
-import Data.Maybe (fromJust)
 
 main :: IO ()
 main = do

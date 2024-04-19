@@ -6,8 +6,6 @@ import qualified Runtime.Filesystem as FS
 
 import System.Directory
 import System.FilePath
-import Data.Foldable (find)
-import Data.Maybe
 import System.IO
 
 -- | Value in lambda q
