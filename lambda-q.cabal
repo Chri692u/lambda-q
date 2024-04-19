@@ -19,14 +19,13 @@ extra-source-files: CHANGELOG.md
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Language.Syntax, Language.Types, Language.Eval,
+  exposed-modules:     Language.Syntax, Language.Parser Language.Types, Language.Eval,
                        Runtime.Env, Runtime.Filesystem
-  build-depends:       base, mtl, containers, directory, filepath
-                       
+  build-depends:       base, mtl, containers, directory, filepath, text, megaparsec, parser-combinators   
   default-language:    Haskell2010
 
 executable lambda-q
     main-is:          Main.hs
-    build-depends:    base, lambda-q, directory, filepath
+    build-depends:    base, lambda-q, directory, filepath, text, megaparsec
     hs-source-dirs:   app
     default-language: Haskell2010

@@ -4,10 +4,15 @@ module Language.Types where
 data Type = Base String
           | TArr Type Type
           | TQuote Type
-          deriving (Show, Eq)
+          deriving (Eq)
+
+instance Show Type where
+    show (Base s) = s
+    show (TArr t1 t2) = "(" ++ show t1 ++ " -> " ++ show t2 ++ ")"
+    show (TQuote t) = "`" ++ show t ++ "`"
 
 stringType :: Type
-stringType = Base "String"
+stringType = Base "string"
 
 unitType :: Type
-unitType = Base "()"
+unitType = Base "unit"

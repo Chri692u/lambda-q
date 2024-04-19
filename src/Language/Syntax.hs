@@ -40,7 +40,7 @@ data Con = CString String
          | CRM Exp
 
 instance Show Con where
-    show (CString str) = str
+    show (CString str) = "\"" ++ str ++ "\""
     show CCWD = "cwd"
     show (CCD exp) = "cd " ++ show exp
     show (CTOUCH exp) = "touch " ++ show exp

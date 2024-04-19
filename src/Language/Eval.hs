@@ -1,6 +1,7 @@
 module Language.Eval where
 
 import Language.Syntax
+import Language.Types
 import qualified Runtime.Env as E
 import qualified Runtime.Filesystem as FS
 
@@ -12,13 +13,13 @@ import System.IO
 data Val = VUnit
            | VString String
            | VQuote Exp
-           | VClosure Id Exp EnvV
+           | VClosure Id Type Exp EnvV
 
 instance Show Val where
   show VUnit = "VUnit"
   show (VString str) = "VString " ++ show str
   show (VQuote q) = "V`" ++ show q ++ "`"
-  show (VClosure x t _) = "<" ++ x ++ ":" ++ show t ++ ">"
+  show (VClosure x t _ _) = "<" ++ x ++ ":" ++ show t ++ ">"
 
 -- | Environment for values
 type EnvV = E.Env Val
@@ -53,12 +54,12 @@ eval expr s@(State env p fst) =
             (v, s') <- eval e2 s
             (closure, s'') <- eval e1 s'
             case closure of
-                VClosure x e env' -> do
+                VClosure x t e env' -> do
                     let env'' = E.extend env' (x, v)
                     eval e (State env'' p fst)
                 _ -> error "Runtime error, not a function."
         Abs x t e -> do
-            return (VClosure x e env, s)
+            return (VClosure x t e env, s)
         Quote e -> do
             return (VQuote e, s)
         Unquote e -> do

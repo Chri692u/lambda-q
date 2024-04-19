@@ -5,31 +5,41 @@ import qualified Runtime.Filesystem as FS
 
 import Language.Syntax
 import Language.Types
+import Language.Parser
 import Language.Eval
 import System.Directory
 import System.FilePath
+import Data.Text
+import Text.Megaparsec(errorBundlePretty)
 
-main :: IO ()
-main = do
+initialize :: FilePath -> IO (Either String (State Val))
+initialize p = do
   -- Initial scope
   let env = E.empty :: E.Env Val
   -- Initial path
-  dir <- getCurrentDirectory
-  let path = dir </> "test_system"
   -- Create interpreter session
-  fst <- FS.fs path
+  fst <- FS.fs p
   case fst of
     FS.FST fs -> do
-      setCurrentDirectory path
-      putStrLn $ "Initial directory: " ++ path
-      let state = State env path fs
-      let test = Con $ CString "test.txt"
-      let touch = Abs "x" unitType $ Quote $ Con $ CTOUCH $ Var "x"
-      let expr = Unquote (App touch test)
-      putStrLn $ "Running: " ++ show expr
-      (val, state') <- eval expr state
-      putStrLn $ "Result: " ++ show val
-      putStrLn "Current directory after running:"
-      dir <- getCurrentDirectory
-      print dir
-    _ -> error "Cannot start interpreter without a filesystem"
+      setCurrentDirectory p
+      putStrLn $ "Initial directory: " ++ p
+      let state = State env p fs
+      return $ Right state
+    _ -> return $ Left "Failed to initialize filesystem"
+
+main :: IO ()
+main = do
+  dir <- getCurrentDirectory
+  let path = dir </> "test_system"
+  st <- initialize path
+  case st of
+    Left err -> putStrLn err
+    Right state -> do
+      let code = "(\\x : unit . touch x) \"test.txt\""
+      let res = parseLine (pack code)
+      case res of
+        Left err -> putStrLn $ errorBundlePretty err
+        Right exp -> do
+          putStrLn $ "Parsed: " ++ show exp
+          (val, s) <- eval exp state
+          print val
