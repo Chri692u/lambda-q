@@ -9,7 +9,7 @@ type Id = String
 data BOps = Concat | Seq
 
 instance Show BOps where
-    show Concat = "++"
+    show Concat = ","
     show Seq = ";"
 
 -- | Expressions in lambda q
@@ -28,7 +28,7 @@ instance Show Exp where
     show (App exp1 exp2) = "(" ++ show exp1 ++ " " ++ show exp2 ++ ")"
     show (Abs id _ exp) = "(\\" ++ id ++ "." ++ show exp ++ ")"
     show (Quote exp) = "`" ++ show exp ++ "`"
-    show (Unquote exp) = "(u" ++ show exp ++ "u)"
+    show (Unquote exp) = "(_" ++ show exp ++ "_)"
     show (Bin bops exp1 exp2) = "(" ++ show exp1 ++ " " ++ show bops ++ " " ++ show exp2 ++ ")"
 
 -- | Constants in lambda q
