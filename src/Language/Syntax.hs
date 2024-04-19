@@ -9,7 +9,7 @@ type Id = String
 data BOps = Concat | Seq
 
 instance Show BOps where
-    show Concat = "◦"
+    show Concat = "++"
     show Seq = ";"
 
 -- | Expressions in lambda q
