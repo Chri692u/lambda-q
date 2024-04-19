@@ -45,7 +45,7 @@ parens :: Parser a -> Parser a
 parens = between (symbol "(") (symbol ")")
 
 ---------------------------------------------------
--- Parser
+-- Parsing
 ---------------------------------------------------
 constant :: Parser Exp
 constant = choice [
@@ -56,6 +56,20 @@ constant = choice [
     symbol "rm" *> (Con . CRM <$> expr),
     Con . CString <$> lexeme (char '"' *> manyTill L.charLiteral (char '"'))
   ]
+
+quote :: Parser Exp
+quote = do 
+    _ <- char '`'
+    e <- expr
+    _ <- char '`'
+    return $ Quote e
+
+unquote :: Parser Exp
+unquote = do 
+    _ <- char '_'
+    e <- expr
+    _ <- char '_'
+    return $ Unquote e
 
 variable :: Parser Exp
 variable = do
@@ -71,19 +85,12 @@ abstraction = do
     symbol "."
     Abs var t <$> expr
 
-{-
-data Exp = Var Id
-         | Con Con
-         | App Exp Exp
-         | Abs Id Type Exp
-         | Quote Exp
-         | Unquote Exp
-         | Bin BOps Exp Exp
--}
 term :: Parser Exp
 term = choice [
         parens expr,
-        try constant,
+        try quote,
+        try unquote,
+        constant,
         variable,
         abstraction
     ]
@@ -93,7 +100,9 @@ expr = do
     es <- many term
     return (foldl1 App es)
 
--- Type parsers
+---------------------------------------------------
+-- Type parsing
+---------------------------------------------------
 tAtom :: Parser Type
 tAtom = choice [symbol "string" $> stringType,
                 symbol "unit" $> unitType,
