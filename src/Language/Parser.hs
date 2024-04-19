@@ -85,15 +85,24 @@ abstraction = do
     symbol "."
     Abs var t <$> expr
 
+operators :: [[Operator Parser Exp]]
+operators = 
+  [ [ InfixL (Bin Concat <$ symbol ",") ]
+  , [ InfixL (Bin Seq <$ symbol ";") ]
+  , [ InfixL (App <$ pure ()) ]
+  ]
+
 term :: Parser Exp
-term = choice [
+term = makeExprParser term' operators
+  where
+    term' = choice [
         parens expr,
         try quote,
         try unquote,
         constant,
         variable,
         abstraction
-    ]
+      ]
 
 expr :: Parser Exp
 expr = do
