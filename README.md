@@ -7,7 +7,7 @@ The abstract syntax of the language is the lambda calculus extended with notatio
 - `e` ∈ **Exp**
 
 Expressions `e` in the language can be defined as follows:
-e ::= e1 e2 | λx.e | ⌊e⌋ | ⌈e⌉ | x | c | e1 ◦ e2
+e ::= e1 e2 | λx.e | ⌊e⌋ | ⌈e⌉ | x | c | e1 ◦ e2 | e1 ; e2
 
 
 Constants in the language can be described as **Con** = Σ* ∪ **OsCon** where **OsCon** is the set of builtin functions and constants from the underlying operating system. As an example, the set of builtins for Unix could be **OsCon** = { `mkdir`, `touch`, `cd`, `cwd`, `rm` }. The values `v` in the $\lambda_q$-calculus need to be defined:
