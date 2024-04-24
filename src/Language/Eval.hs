@@ -46,10 +46,6 @@ eval expr s@(State env p fst) =
             case v of
                 Just val -> return (val, s)
                 Nothing -> error "Variable not in scope."
-        App (Quote e1) e2 -> do
-            return (VQuote (App e1 e2), s)
-        App e1 (Quote e2) -> do
-            return (VQuote (App e1 e2), s)
         App e1 e2 -> do
             (v, s') <- eval e2 s
             (closure, s'') <- eval e1 s'
@@ -67,9 +63,25 @@ eval expr s@(State env p fst) =
             case v of
                 VQuote q -> eval q s'
                 _ -> error "Runtime error, expected a quote."
+        Bin op (Quote e1) (Quote e2) -> return (VQuote (Bin op e1 e2), s)
+        Bin op (Quote e1) e2 -> return (VQuote (Bin op e1 e2), s)
+        Bin op e1 (Quote e2) -> return (VQuote (Bin op e1 e2), s)
         Bin op e1 e2 -> do
-            undefined
+            case op of
+                Concat -> do
+                    (v1, s') <- eval e1 s
+                    (v2, s'') <- eval e2 s'
+                    case (v1, v2) of
+                        (VQuote e1', VQuote e2') -> return (VQuote (Bin Concat e1' e2'), s'')
+                        (v1, VQuote e2') -> return (VQuote (Bin Concat e1 e2'), s'')
+                        (VQuote e1', v2) -> return (VQuote (Bin Concat e1' e2), s'')
+                        (VString s1, VString s2) -> return (VString (s1 ++ s2), s'')
+                Seq -> do
+                    (v1, s') <- eval e1 s
+                    (v2, s'') <- eval e2 s'
+                    return (v2, s'')
 
+                
 evalOS :: Con -> State Val -> Interpreter Val
 evalOS c s@(State env p fst) =
     case c of

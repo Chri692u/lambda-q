@@ -36,9 +36,10 @@ main = do
     Left err -> putStrLn err
     Right state -> do
       let code1 = pack "(\\x : string . `touch x`) \"test.txt\""
-      let code2 = pack "\"test\" , \"/test.txt\""
-      let code3 = pack "touch \"1.txt\" ; touch \"2.txt\""
-      let res = parseLine code2
+      let code2 = pack "`\"haha\"` , \"test\" , \"haha\""
+      let code3 = pack "(touch \"1.txt\") ; (touch \"2.txt\")"
+      let code4 = pack "_(\\x : q string . x) `\"haha\"`_"
+      let res = parseLine code3
       case res of
         Left err -> putStrLn $ errorBundlePretty err
         Right exp -> do

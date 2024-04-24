@@ -62,6 +62,7 @@ quote = do
     _ <- char '`'
     e <- expr
     _ <- char '`'
+    spaces
     return $ Quote e
 
 unquote :: Parser Exp
@@ -69,6 +70,7 @@ unquote = do
     _ <- char '_'
     e <- expr
     _ <- char '_'
+    spaces
     return $ Unquote e
 
 variable :: Parser Exp
@@ -88,7 +90,7 @@ abstraction = do
 operators :: [[Operator Parser Exp]]
 operators = 
   [ [ InfixL (Bin Concat <$ symbol ",") ]
-  , [ InfixL (Bin Seq <$ symbol ";") ]
+  , [ InfixR (Bin Seq <$ symbol ";") ]
   , [ InfixL (App <$ pure ()) ]
   ]
 
@@ -112,9 +114,11 @@ expr = do
 ---------------------------------------------------
 -- Type parsing
 ---------------------------------------------------
+
 tAtom :: Parser Type
 tAtom = choice [symbol "string" $> stringType,
                 symbol "unit" $> unitType,
+                symbol "q" >> fmap TQuote tAtom,
                 parens types]
 
 types :: Parser Type
