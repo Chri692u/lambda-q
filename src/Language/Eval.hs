@@ -97,6 +97,7 @@ evalOS c s@(State env p fst) =
                         FS.FST fst -> return (VUnit, State env p' fst)
                         _ -> error "Cursor is not under a directory."
                 _ -> error "Runtime error, expected a string."
+
         CTOUCH file -> do
             (dir, s') <- eval file s
             case dir of
@@ -108,6 +109,7 @@ evalOS c s@(State env p fst) =
                         FS.FST fst -> return (VUnit, State env p fst)
                         _ -> error "Cursor is not under a directory."
                 _ -> error "Runtime error, expected a string."
+
         CMKDIR dir -> do
             (dir, s') <- eval dir s
             case dir of
@@ -118,6 +120,7 @@ evalOS c s@(State env p fst) =
                         FS.FST fst -> return (VUnit, State env p fst)
                         _ -> error "Cursor is not under a directory."
                 _ -> error "Runtime error, expected a string."
+                
         CRM file -> do
             (file, s') <- eval file s
             case file of

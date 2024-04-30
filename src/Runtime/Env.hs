@@ -3,8 +3,8 @@ module Runtime.Env where
 import Language.Syntax
 import Language.Types
 
-import Data.Monoid
-import Data.Foldable hiding (toList)
+import Control.Monad.Except
+import Control.Monad.Reader
 import qualified Data.Map as M
 
 -- | Generic type for environments
@@ -43,3 +43,26 @@ fromList xs = Env (M.fromList xs)
 
 toList :: Env a -> [(Id, a)]
 toList (Env env) = M.toList env
+
+-- | Specialized environment for types
+type Gamma = Env Type
+
+-- | Specialized environment for built-in functions
+builtins :: Gamma
+builtins = fromList 
+    [ ("cwd", stringType)
+    , ("cd", TArr stringType unitType)
+    , ("touch", TArr stringType unitType)
+    , ("mkdir", TArr stringType unitType)
+    , ("rm", TArr stringType unitType)
+    ]
+
+-- | Typechecking monad
+type Check a = ExceptT String (Reader Gamma) a
+
+-- | Extend the environment with a new binding
+extendM :: (Id, Type) -> Check a -> Check a
+extendM (x, t) act = do
+  env <- ask
+  let env' = extend env (x, t)
+  local (const env') act
